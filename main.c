@@ -9,11 +9,6 @@
 
 int main()
 {
-    const char englishLetters[NO_LETTERS] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-                                              'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-    const float englishFrequencies[NO_LETTERS] = {8.2f, 1.5f, 2.8f, 4.3f, 12.7f, 2.0f, 6.2f, 7.0f, 0.2f, 0.8f, 4.0f,
-                                                 2.4f, 6.7f, 7.5f, 1.9f, 0.1f, 6.0f, 2.8f, 9.1f, 2.8f, 1.0f, 2.4f,
-                                                 0.2f, 2.0f, 0.1f};
 
     char text[256] = "D rvn, D nvr, D y";
     Key bestKeys[NO_LETTERS];
