@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 
+
 #define NO_LETTERS 26
 
 float computeChiSquared(const float actualFrequencies[NO_LETTERS], const float expectedFrequencies[NO_LETTERS])
@@ -64,7 +65,7 @@ void computeLetterDistribution(const char text[], float currentLetterDistributio
     }
 
     for (int i = 0; i < NO_LETTERS; ++i)
-        currentLetterDistribution[i] = (float)frequencyLetters[i] / totalNumberLetters;
+        currentLetterDistribution[i] = ((float)frequencyLetters[i] / totalNumberLetters) * 100;
 }
 
 void nextCircularPermutation(float currentPermutation[NO_LETTERS])
@@ -76,8 +77,23 @@ void nextCircularPermutation(float currentPermutation[NO_LETTERS])
     currentPermutation[0] = lastElement;
 }
 
+typedef struct
+{
+    float distance;
+    int key;
+}Key;
 
-int findBestEncryptionKey(const char text[])
+int compareFct(const void* a, const void* b)
+{
+    Key arg1 = *(const Key *)a;
+    Key arg2 = *(const Key *)b;
+
+    if (arg1.distance < arg2.distance) return -1;
+    if (arg1.distance > arg2.distance) return 1;
+    return 0;
+
+}
+void findBestDecryptionKeys(const char text[], Key decryptionKeys[NO_LETTERS])
 {
     float expectedLetterDistribution[NO_LETTERS];
     readLetterDistribution("distribution.txt", expectedLetterDistribution);
@@ -85,23 +101,20 @@ int findBestEncryptionKey(const char text[])
     float currentLetterDistribution[NO_LETTERS];
     computeLetterDistribution(text, currentLetterDistribution);
 
-    float minDistance = computeChiSquared(currentLetterDistribution, expectedLetterDistribution);
-    int minKey = 0;
 
-    for (int i = 1; i < NO_LETTERS; ++i)
+    for (int i = 0; i < NO_LETTERS; ++i)
     {
-        nextCircularPermutation(currentLetterDistribution);
-        float currentDistance = computeChiSquared(currentLetterDistribution, expectedLetterDistribution);
 
-        if (currentDistance < minDistance)
-        {
-            minDistance = currentDistance;
-            minKey = i;
-        }
+        float currentDistance = computeChiSquared(currentLetterDistribution, expectedLetterDistribution);
+        decryptionKeys[i].distance = currentDistance;
+        decryptionKeys[i].key = i;
+
+
+        nextCircularPermutation(currentLetterDistribution);
     }
 
+    qsort(decryptionKeys, NO_LETTERS, sizeof(Key), compareFct);
 
-    return minKey;
 }
 
 
@@ -136,11 +149,18 @@ int main()
                                                  2.4f, 6.7f, 7.5f, 1.9f, 0.1f, 6.0f, 2.8f, 9.1f, 2.8f, 1.0f, 2.4f,
                                                  0.2f, 2.0f, 0.1f};
 
-    char text[256] = "Xvznvm Xdkczm! dn vi diozmznodib xjyz dyzv wpo do vxopvggt npxfn hvi";
-    int encryptionKey = findBestEncryptionKey(text);
+    char text[256] = "I was, I saw, I died but you didnt care one bit to tell me your secret so I couldnt do anything to you!!!!!! ";
+    Key bestKeys[NO_LETTERS];
+    findBestDecryptionKeys(text, bestKeys);
 
-    encrypt(text, encryptionKey);
+    for (int i = 0; i < 3; ++i)
+    {
+        char newText[256];
+        strcpy(newText, text);
+        encrypt(newText, bestKeys[i].key);
 
-    printf("%s", text);
+        printf("%s\n\tKey Likelihood value:\t%f\n\n", newText, bestKeys[i].distance);
+    }
+
     return 0;
 }
