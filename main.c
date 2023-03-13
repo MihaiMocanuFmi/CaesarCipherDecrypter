@@ -4,9 +4,6 @@
 #include "decrypter.h"
 
 
-#define NO_LETTERS 26
-
-
 int main()
 {
 
